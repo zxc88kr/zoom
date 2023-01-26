@@ -14,11 +14,26 @@ const httpServer = http.createServer(app);
 const wsServer = new Server(httpServer);
 
 wsServer.on("connection", (socket) => {
-    socket.on("enterRoom", (msg, done) => {
-        console.log(msg);
-        setTimeout(() => {
-            done();
-        }, 5000);
+    socket["nickname"] = "Anonymous";
+    socket.onAny((event) => {
+        console.log(`Socket Event: ${event}`);
+    });
+    socket.on("enterRoom", (roomName, done) => {
+        socket.join(roomName);
+        done();
+        socket.to(roomName).emit("welcome", socket.nickname);
+    });
+    socket.on("disconnecting", () => {
+        socket.rooms.forEach((room) => {
+            socket.to(room).emit("bye", socket.nickname);
+        });
+    });
+    socket.on("nickname", (nick) => {
+        socket["nickname"] = nick;
+    });
+    socket.on("newMessage", (msg, room, done) => {
+        socket.to(room).emit("newMessage", `${socket.nickname}: ${msg}`);
+        done();
     });
 });
 

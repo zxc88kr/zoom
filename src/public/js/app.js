@@ -1,79 +1,17 @@
 const socket = io();
 
-const welcome = document.getElementById("welcome");
-const welcomeForm = welcome.querySelector("form");
+const myFace = document.getElementById("myFace");
 
-const room = document.getElementById("room");
-const nameForm = room.querySelector("#name");
-const msgForm = room.querySelector("#msg");
+let myStream;
 
-room.hidden = true;
-
-let roomName;
-
-function handleNicknameSubmit(event) {
-    event.preventDefault();
-    const input = nameForm.querySelector("input");
-    socket.emit("nickname", input.value);
+async function getMedia() {
+    try {
+        myStream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: true
+        });
+        myFace.srcObject = myStream;
+    } catch (err) {
+        console.log(err);
+    }
 }
-
-function handleMessageSubmit(event) {
-    event.preventDefault();
-    const input = msgForm.querySelector("input");
-    const value = input.value;
-    socket.emit("newMessage", value, roomName, () => {
-        addMessage(`You: ${value}`);
-    });
-    input.value = "";
-}
-
-function showRoom() {
-    welcome.hidden = true;
-    room.hidden = false;
-    const h3 = room.querySelector("h3");
-    h3.innerText = `Room ${roomName}`;
-    nameForm.addEventListener("submit", handleNicknameSubmit);
-    msgForm.addEventListener("submit", handleMessageSubmit);
-}
-
-welcomeForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const input = welcomeForm.querySelector("input");
-    socket.emit("enterRoom", input.value, showRoom);
-    roomName = input.value;
-    input.value = "";
-});
-
-function addMessage(message) {
-    const ul = room.querySelector("ul");
-    const li = document.createElement("li");
-    li.innerText = message;
-    ul.appendChild(li);
-}
-
-socket.on("welcome", (user, newCount) => {
-    const h3 = room.querySelector("h3");
-    h3.innerText = `Room ${roomName} (${newCount})`;
-    addMessage(`${user} joined!`)
-});
-
-socket.on("bye", (user, newCount) => {
-    const h3 = room.querySelector("h3");
-    h3.innerText = `Room ${roomName} (${newCount})`;
-    addMessage(`${user} left!`)
-});
-
-socket.on("newMessage", addMessage);
-
-socket.on("roomChange", (rooms) => {
-    const roomList = welcome.querySelector("ul");
-    roomList.innerHTML = "";
-    if (rooms.length === 0) {
-        return;
-    };
-    rooms.forEach((room) => {
-        const li = document.createElement("li");
-        li.innerText = room;
-        roomList.append(li);
-    });
-});

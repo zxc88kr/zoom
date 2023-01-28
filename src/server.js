@@ -13,12 +13,6 @@ app.get("/*", (_, res) => res.redirect("/"));
 const httpServer = http.createServer(app);
 const wsServer = new Server(httpServer);
 
-wsServer.on("connection", (socket) => {
-    socket.onAny((event) => {
-        console.log(`Socket Event: ${event}`);
-    });
-});
-
 httpServer.listen(3000, () => {
     console.log(`Listening on http://localhost:3000`);
 });

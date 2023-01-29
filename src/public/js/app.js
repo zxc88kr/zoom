@@ -1,13 +1,15 @@
 const socket = io();
 
+// Video Call (P2P Connection using WebRTC)
+
 const myFace = document.getElementById("myFace");
 const voiceBtn = document.getElementById("voice");
 const cameraBtn = document.getElementById("camera");
 const camerasSelect = document.getElementById("cameras");
 
 let myStream;
-let voiceOff = false;
-let cameraOff = false;
+let voiceOn = true;
+let cameraOn = true;
 let roomName;
 
 /** @type {RTCPeerConnection} */
@@ -47,6 +49,7 @@ async function getMedia(deviceId) {
         myStream = await navigator.mediaDevices.getUserMedia(
             deviceId ? cameraConstrains : initialConstrains
         );
+        setInputInfo();
         myFace.srcObject = myStream;
         if (!deviceId) {
             await getCameras();
@@ -56,15 +59,34 @@ async function getMedia(deviceId) {
     };
 }
 
+function setInputInfo() {
+    myStream
+    .getAudioTracks()
+    .forEach((track) => track.enabled = voiceOn);
+    if (voiceOn) {
+        voiceBtn.innerText = "Voice Off"
+    } else {
+        voiceBtn.innerText = "Voice On";
+    }
+    myStream
+    .getVideoTracks()
+    .forEach((track) => track.enabled = cameraOn);
+    if (cameraOn) {
+        cameraBtn.innerText = "Camera Off"
+    } else {
+        cameraBtn.innerText = "Camera On";
+    }
+}
+
 function handleVoiceClick() {
     myStream
     .getAudioTracks()
     .forEach((track) => track.enabled = !track.enabled);
-    if (!voiceOff) {
-        voiceOff = true;
+    if (voiceOn) {
+        voiceOn = false;
         voiceBtn.innerText = "Voice On"
     } else {
-        voiceOff = false;
+        voiceOn = true;
         voiceBtn.innerText = "Voice Off";
     }
 }
@@ -73,11 +95,11 @@ function handleCameraClick() {
     myStream
     .getVideoTracks()
     .forEach((track) => track.enabled = !track.enabled);
-    if (!cameraOff) {
-        cameraOff = true;
+    if (cameraOn) {
+        cameraOn = false;
         cameraBtn.innerText = "Camera On"
     } else {
-        cameraOff = false;
+        cameraOn = true;
         cameraBtn.innerText = "Camera Off";
     }
 }
@@ -97,7 +119,7 @@ voiceBtn.addEventListener("click", handleVoiceClick);
 cameraBtn.addEventListener("click", handleCameraClick);
 camerasSelect.addEventListener("input", handleCameraChange);
 
-// Chat Form (chat with a message)
+// Chat Form (P2P Connection using WebRTC)
 
 const chat = document.getElementById("chat");
 const chatForm = chat.querySelector("form")

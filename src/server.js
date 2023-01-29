@@ -14,9 +14,19 @@ const httpServer = http.createServer(app);
 const wsServer = new Server(httpServer);
 
 wsServer.on("connection", (socket) => {
-    socket.on("joinRoom", (roomName) => {
+    socket.on("verifiy", (roomName, done) => {
+        const room = wsServer.sockets.adapter.rooms.get(roomName);
+        const roomSize = room ? room.size : 0;
+        if (roomSize >= 2) {
+            done("FULL");
+        } else {
+            done("OK");
+        }
+    });
+    socket.on("joinRoom", (roomName, nickName) => {
         socket.join(roomName);
-        socket.to(roomName).emit("welcome");
+        socket["nickName"] = nickName;
+        socket.to(roomName).emit("welcome", socket.nickName);
     });
     socket.on("offer", (offer, roomName) => {
         socket.to(roomName).emit("offer", offer);
@@ -26,6 +36,11 @@ wsServer.on("connection", (socket) => {
     });
     socket.on("ice", (ice, roomName) => {
         socket.to(roomName).emit("ice", ice);
+    });
+    socket.on("disconnecting", () => {
+        socket.rooms.forEach((room) => {
+            socket.to(room).emit("bye", socket.nickName);
+        });
     });
 });
 

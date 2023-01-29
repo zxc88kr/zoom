@@ -13,8 +13,9 @@ html(lang="en")
             div#welcome
                 form
                     input(placeholder="room name", type="text", required)
+                    input(placeholder="nick name", type="text", required)
                     button#room Enter room
-            div#call
+            div#call(hidden)
                 div#myStream
                     video#myFace(width="400", height="400", autoplay, playsinline)
                     button#voice Voice Off
@@ -22,5 +23,6 @@ html(lang="en")
                     select#cameras
                 div#peerStream
                     video#peerFace(width="400", height="400", autoplay, playsinline)
+            div#chat(hidden)
         script(src="/socket.io/socket.io.js")
         script(src="/public/js/app.js")

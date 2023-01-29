@@ -9,7 +9,6 @@ let myStream;
 let voiceOff = false;
 let cameraOff = false;
 let roomName;
-//let nickName;
 
 /** @type {RTCPeerConnection} */
 let myPeerConnection;
@@ -98,15 +97,40 @@ voiceBtn.addEventListener("click", handleVoiceClick);
 cameraBtn.addEventListener("click", handleCameraClick);
 camerasSelect.addEventListener("input", handleCameraChange);
 
+// Chat Form (chat with a message)
+
+const chat = document.getElementById("chat");
+const chatForm = chat.querySelector("form")
+const messageList = chat.querySelector("ul");
+
+function handleChatReceive(nickName, event) {
+    const li = document.createElement("li");
+    li.innerText = `${nickName}: ${event.data}`;
+    messageList.appendChild(li);
+}
+
+function handleChatSend(event) {
+    event.preventDefault();
+    const input = chat.querySelector("input");
+    myDataChannel.send(input.value);
+    const li = document.createElement("li");
+    li.innerText = `You: ${input.value}`;
+    messageList.appendChild(li);
+    input.value = "";
+}
+
+chatForm.addEventListener("submit", handleChatSend);
+
 // Welcome Form (join a room)
 
-const call = document.getElementById("call");
 const welcome = document.getElementById("welcome");
 const welcomeForm = welcome.querySelector("form")
+const call = document.getElementById("call");
 
 async function initCall() {
     welcome.hidden = true;
     call.hidden = false;
+    chat.hidden = false;
     await getMedia();
     makeConnection();
 }
@@ -136,20 +160,19 @@ socket.on("welcome", async (nickName) => {
     console.log(`Hi~ ${nickName}`);
     myDataChannel = myPeerConnection.createDataChannel("chat");
     myDataChannel.addEventListener("message", (event) => {
-        console.log(event.data);
+        handleChatReceive(nickName, event);
     });
-
     const offer = await myPeerConnection.createOffer();
     myPeerConnection.setLocalDescription(offer);
     console.log("sent the offer");
     socket.emit("offer", offer, roomName);
 });
 
-socket.on("offer", async (offer) => {
+socket.on("offer", async (offer, nickName) => {
     myPeerConnection.addEventListener("datachannel", (event) => {
         myDataChannel = event.channel;
         myDataChannel.addEventListener("message", (event) => {
-            console.log(event.data);
+            handleChatReceive(nickName, event);
         });
     });
     console.log("received the offer");

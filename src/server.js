@@ -29,7 +29,7 @@ wsServer.on("connection", (socket) => {
         socket.to(roomName).emit("welcome", socket.nickName);
     });
     socket.on("offer", (offer, roomName) => {
-        socket.to(roomName).emit("offer", offer);
+        socket.to(roomName).emit("offer", offer, socket.nickName);
     });
     socket.on("answer", (answer, roomName) => {
         socket.to(roomName).emit("answer", answer);

@@ -20,5 +20,7 @@ html(lang="en")
                     button#voice Voice Off
                     button#camera Camera Off
                     select#cameras
+                div#peerStream
+                    video#peerFace(width="400", height="400", autoplay, playsinline)
         script(src="/socket.io/socket.io.js")
         script(src="/public/js/app.js")

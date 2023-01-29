@@ -129,15 +129,32 @@ socket.on("offer", async (offer) => {
     socket.emit("answer", answer, roomName);
 });
 
-socket.on("answer", async (answer) => {
+socket.on("answer", (answer) => {
     console.log("received the answer");
     myPeerConnection.setRemoteDescription(answer);
 });
 
+socket.on("ice", (ice) => {
+    console.log("received the candidate");
+    myPeerConnection.addIceCandidate(ice);
+});
+
 // RTC Code
+
+function handleIce(data) {
+    console.log("sent the candidate");
+    socket.emit("ice", data.candidate, roomName);
+}
+
+function handleAddStream(data) {
+    const peerFace = document.getElementById("peerFace");
+    peerFace.srcObject = data.stream;
+}
 
 function makeConnection() {
     myPeerConnection = new RTCPeerConnection();
+    myPeerConnection.addEventListener("icecandidate", handleIce);
+    myPeerConnection.addEventListener("addstream", handleAddStream);
     myStream.getTracks()
     .forEach((track) => myPeerConnection.addTrack(track, myStream));
 }

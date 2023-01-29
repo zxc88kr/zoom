@@ -1,18 +1,20 @@
 const socket = io();
 
+const call = document.getElementById("call");
+
+call.hidden = true;
+
 const myFace = document.getElementById("myFace");
 const voiceBtn = document.getElementById("voice");
 const cameraBtn = document.getElementById("camera");
 const camerasSelect = document.getElementById("cameras");
 
-const call = document.getElementById("call");
-
-call.hidden = true;
-
 let myStream;
 let voiceOff = false;
 let cameraOff = false;
 let roomName;
+
+/** @type {RTCPeerConnection} */
 let myPeerConnection;
 
 async function getCameras() {
@@ -91,17 +93,18 @@ camerasSelect.addEventListener("input", handleCameraChange);
 const welcome = document.getElementById("welcome");
 const welcomeForm = welcome.querySelector("form")
 
-async function startMedia() {
+async function initCall() {
     welcome.hidden = true;
     call.hidden = false;
     await getMedia();
     makeConnection();
 }
 
-function handleWelcomeSubmit(event) {
+async function handleWelcomeSubmit(event) {
     event.preventDefault();
     const input = welcome.querySelector("input");
-    socket.emit("joinRoom", input.value, startMedia);
+    await initCall();
+    socket.emit("joinRoom", input.value);
     roomName = input.value;
     input.value = "";
 }
@@ -113,11 +116,22 @@ welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 socket.on("welcome", async () => {
     const offer = await myPeerConnection.createOffer();
     myPeerConnection.setLocalDescription(offer);
+    console.log("sent the offer");
     socket.emit("offer", offer, roomName);
 });
 
-socket.on("offer", (offer) => {
-    console.log(offer);
+socket.on("offer", async (offer) => {
+    console.log("received the offer");
+    myPeerConnection.setRemoteDescription(offer);
+    const answer = await myPeerConnection.createAnswer();
+    myPeerConnection.setLocalDescription(answer);
+    console.log("sent the answer");
+    socket.emit("answer", answer, roomName);
+});
+
+socket.on("answer", async (answer) => {
+    console.log("received the answer");
+    myPeerConnection.setRemoteDescription(answer);
 });
 
 // RTC Code

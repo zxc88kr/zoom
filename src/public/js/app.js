@@ -6,9 +6,9 @@ const myFace = document.getElementById("myFace");
 const voiceBtn = document.getElementById("voice");
 const cameraBtn = document.getElementById("camera");
 const camerasSelect = document.getElementById("cameras");
-
+//////////let voiceOn = true;//////////
 let myStream;
-let voiceOn = true;
+let voiceOn = false;
 let cameraOn = true;
 let roomName;
 

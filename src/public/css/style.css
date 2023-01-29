@@ -41,3 +41,52 @@ table {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
+
+* {
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	color: #333333;
+	box-sizing: border-box;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	width: 100%;
+}
+
+button {
+	background-color: #645CBB;
+	border: none;
+}
+
+header {
+	margin-top: 36px;
+	margin-bottom: 24px;
+}
+
+h1 {
+	color: #A084DC;
+	text-align: center;
+	font-weight: 600;
+	font-size: 60px;
+	letter-spacing: 6px;
+}
+
+#login {
+	width: 360px;
+}
+
+#login input {
+	height: 45px;
+	width: 360px;
+	font-size: 16px;
+	margin-top: 16px;
+}
+
+#login button {
+	width: 360px;
+	font-size: 14px;
+}

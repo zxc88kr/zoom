@@ -3,12 +3,15 @@ const socket = io();
 // Video Call (P2P Connection using WebRTC)
 
 const myFace = document.getElementById("myFace");
+const peerFace = document.getElementById("peerFace");
+const peerStream = document.getElementById("peerStream");
+
 const voiceBtn = document.getElementById("voice");
 const cameraBtn = document.getElementById("camera");
 const camerasSelect = document.getElementById("cameras");
-//////////let voiceOn = true;//////////
+
 let myStream;
-let voiceOn = false;
+let voiceOn = true;
 let cameraOn = true;
 let roomName;
 
@@ -147,12 +150,11 @@ chatForm.addEventListener("submit", handleChatSend);
 
 const welcome = document.getElementById("welcome");
 const welcomeForm = welcome.querySelector("form")
-const call = document.getElementById("call");
+const contents = document.getElementById("contents");
 
-async function initCall() {
+async function initContents() {
     welcome.hidden = true;
-    call.hidden = false;
-    chat.hidden = false;
+    contents.hidden = false;
     await getMedia();
     makeConnection();
 }
@@ -164,7 +166,7 @@ function handleWelcomeSubmit(event) {
         if (message === "FULL") {
             alert("This room is full");
         } else {
-            await initCall();
+            await initContents();
             socket.emit("joinRoom", input[0].value, input[1].value);
             roomName = input[0].value;
             nickName = input[1].value;
@@ -217,6 +219,9 @@ socket.on("ice", (ice) => {
 
 socket.on("bye", (nickName) => {
     console.log(`Bye~ ${nickName}`);
+    peerStream.hidden = true;
+    chat.hidden = true;
+    messageList.innerHTML = "";
 });
 
 // RTC Code
@@ -228,8 +233,9 @@ function makeConnection() {
         socket.emit("ice", data.candidate, roomName);
     });
     myPeerConnection.addEventListener("addstream", (data) => {
-        const peerFace = document.getElementById("peerFace");
         peerFace.srcObject = data.stream;
+        peerStream.hidden = false;
+        chat.hidden = false;
     });
     myStream
     .getTracks()

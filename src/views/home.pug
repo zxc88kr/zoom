@@ -16,18 +16,22 @@ html(lang="en")
                     input(placeholder="room name", type="text", required)
                     input(placeholder="nick name", type="text", required)
                     button#room Enter room
-            div#call(hidden)
-                div#myStream
-                    video#myFace(width="400", height="400", autoplay, playsinline)
-                    button#voice Voice Off
-                    button#camera Camera Off
-                    select#cameras
-                div#peerStream
-                    video#peerFace(width="400", height="400", autoplay, playsinline)
-            div#chat(hidden)
-                form#message
-                    input(placeholder="Please enter a message", type="text", required)
-                    button#room Enter
-                ul#messageList
+            div#contents(hidden)
+                div#call
+                    div#myStream
+                        video#myFace(width="400", height="360", autoplay, playsinline)
+                    div#peerStream(hidden)
+                        video#peerFace(width="400", height="360", autoplay, playsinline)
+                div#options
+                    div#buttons
+                        button#voice Voice Off
+                        button#camera Camera Off
+                    div#selects
+                        select#cameras
+                div#chat(hidden)
+                    form#message
+                        input(placeholder="Please enter a message", type="text", required)
+                        button#room Enter
+                    ul#messageList
         script(src="/socket.io/socket.io.js")
         script(src="/public/js/app.js")

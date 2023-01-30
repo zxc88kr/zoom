@@ -169,7 +169,6 @@ function handleWelcomeSubmit(event) {
             await initContents();
             socket.emit("joinRoom", input[0].value, input[1].value);
             roomName = input[0].value;
-            nickName = input[1].value;
         }
         input[0].value = "";
         input[1].value = "";
@@ -181,7 +180,7 @@ welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 // Socket Code
 
 socket.on("welcome", async (nickName) => {
-    console.log(`Hi~ ${nickName}`);
+    console.log(`${nickName} joined!`);
     myDataChannel = myPeerConnection.createDataChannel("chat");
     myDataChannel.addEventListener("message", (event) => {
         handleChatReceive(nickName, event);
@@ -218,7 +217,7 @@ socket.on("ice", (ice) => {
 });
 
 socket.on("bye", (nickName) => {
-    console.log(`Bye~ ${nickName}`);
+    console.log(`${nickName} left!`);
     peerStream.hidden = true;
     chat.hidden = true;
     messageList.innerHTML = "";
